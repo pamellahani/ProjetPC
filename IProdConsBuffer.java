@@ -10,6 +10,13 @@ public interface IProdConsBuffer {
      * Retrieve a message from the buffer,
      * following a FIFO order (if M1 was put before M2, M1
      * is retrieved before M2)
+     **/
+    public Message get() throws InterruptedException;
+
+    /**
+     * Retrieve a message from the buffer,
+     * following a FIFO order (if M1 was put before M2, M1
+     * is retrieved before M2)
      **
      * public Message get() throws InterruptedException;
      * /**
