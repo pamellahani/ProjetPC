@@ -2,22 +2,22 @@ package ProjetPC;
 
 /*
 
-+----------------+------------+------------------------+----------------+--+
-| Methode        | Pre-action | Garde                  | Post-action    |  |
-+----------------+------------+------------------------+----------------+--+
-| put(Message M) | -          | nfree > 0              | nfree --       |  |
-|                |            |                        |                |  |
-|                |            | num_stored == bufferSz | num_stored ++  |  |
-+----------------+------------+------------------------+----------------+--+
-| get()          | -          | num_stored = 0         | nfree ++       |  |
-|                |            |                        |                |  |
-|                |            |                        | num_stored --  |  |
-+----------------+------------+------------------------+----------------+--+
++----------------+------------+------------------------+----------------+
+| Methode        | Pre-action | Garde                  | Post-action    |  
++----------------+------------+------------------------+----------------+
+| put(Message M) | -          | nfree > 0              | nfree --       |
+|                |            |                        |                |
+|                |            | num_stored == bufferSz | num_stored ++  |
++----------------+------------+------------------------+----------------+
+| get()          | -          | num_stored = 0         | nfree ++       |
+|                |            |                        |                |
+|                |            |                        | num_stored --  |
++----------------+------------+------------------------+----------------+
 
  */
 
 public class ProdConsBuffer implements IProdConsBuffer{
-    private int buffersize;
+    private int bufferSz;
     private Message[] buffer;
     private int nfree; 
     private int nmsg;  //=num_stored
@@ -26,7 +26,7 @@ public class ProdConsBuffer implements IProdConsBuffer{
 
 
     public ProdConsBuffer(int size){
-        buffersize = size;
+        bufferSz = size;
         buffer = new Message[size];
         nfree = size ; 
         nmsg = 0;
@@ -46,7 +46,7 @@ public class ProdConsBuffer implements IProdConsBuffer{
     }
 
     public Message get() throws InterruptedException{
-        while(nfree == buffersize){
+        while(nmsg == 0){
             wait();
         }
         Message m = buffer[nfree];
