@@ -1,16 +1,10 @@
 package ProjetPC;
 
-public class ProdConsBuffer implements IProdConsBuffer {
-
-    public ProdConsBuffer() {
-
-    }
+public interface IProdConsBuffer {
     /**
      * Put the message m in the buffer
      **/
-    public void put(Message m) throws InterruptedException{
-
-    }
+    public void put(Message m) throws InterruptedException;
 
     /**
      * Retrieve a message from the buffer,
@@ -22,15 +16,11 @@ public class ProdConsBuffer implements IProdConsBuffer {
      * Returns the number of messages currently available in
      * the buffer
      **/
-    public int nmsg(){
-        return 0;
-    }
+    public int nmsg();
 
     /**
      * Returns the total number of messages that have
      * been put in the buffer since its creation
      **/
-    public int totmsg(){
-        return 0;
-    }
+    public int totmsg();
 }
