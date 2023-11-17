@@ -45,6 +45,7 @@ public class ProdConsBuffer implements IProdConsBuffer{
         notifyAll();
     }
 
+    //get a message from the buffer following a FIFO order 
     public Message get() throws InterruptedException{
         while(nmsg == 0){
             wait();
