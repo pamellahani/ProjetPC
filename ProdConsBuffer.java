@@ -1,5 +1,4 @@
-package PROJET_PC;
-
+package ProjetPC;
 public class ProdConsBuffer {
     public interface IProdConsBuffer {
         /**
