@@ -1,16 +1,33 @@
 package ProjetPC;
 
-public class TestProdCons {
-    static final int BUFFER_SIZE = 5;
-    static final int NB_OPERATIONS = 100;
+import java.io.IOException;
+import java.util.InvalidPropertiesFormatException;
+import java.util.Properties;
 
-    public static void main(String[] args) {
+public class TestProdCons {
+
+    public static void main(String[] args) throws InvalidPropertiesFormatException, IOException {
+        
+        // Load properties from XML file
+        Properties properties = new Properties();
+        properties.loadFromXML(TestProdCons.class.getClassLoader().getResourceAsStream("ProjetPC/options.xml"));
+        
+        // Access values from properties
+        int nProd = Integer.parseInt(properties.getProperty("nProd"));
+        int nCons = Integer.parseInt(properties.getProperty("nCons"));
+        int bufSz = Integer.parseInt(properties.getProperty("bufSz"));
+        int prodTime = Integer.parseInt(properties.getProperty("prodTime"));
+        int consTime = Integer.parseInt(properties.getProperty("consTime"));
+        int minProd = Integer.parseInt(properties.getProperty("minProd"));
+        int maxProd = Integer.parseInt(properties.getProperty("maxProd"));
+        
         // Create an instance of the shared buffer
-        IProdConsBuffer buffer = new ProdConsBuffer(BUFFER_SIZE); 
+        IProdConsBuffer buffer = new ProdConsBuffer(bufSz);
+
 
         // Create a producer and a consumer
-        Producer producteur = new Producer(buffer, NB_OPERATIONS);
-        Consumer consommateur = new Consumer(buffer, NB_OPERATIONS);
+        Producers producteur = new Producers(buffer, nProd, minProd, maxProd, prodTime);
+        Consumers consommateur = new Consumers(buffer, nCons, consTime);
 
         // Wait for both producer and consumer to finish
         try {

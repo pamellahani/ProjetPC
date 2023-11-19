@@ -2,24 +2,31 @@ package ProjetPC;
 
 import java.util.Random;
 
-public class Producer extends Thread {
-    static final int PUT_PER_THREAD = 10;
+public class Producers extends Thread {
 
     IProdConsBuffer buffer;
-    int numberOfProductions = 50;
     int numberOfThreads = 5;
+    int dureeSommeil = 10;
 
-    public Producer(IProdConsBuffer buffer, int numberOfProductions) {
+    // max and min Production
+    int minProd = 0;
+    int maxProd = 500;
+
+    public Producers(IProdConsBuffer buffer,int nProd,int minProd,  int maxProd, int dureeSommeil) {
         this.buffer = buffer;
-        this.numberOfProductions = numberOfProductions;
-        this.numberOfThreads = numberOfProductions / PUT_PER_THREAD;
+        this.dureeSommeil = dureeSommeil;
+        this.numberOfThreads = nProd;
+        this.maxProd = maxProd;
+        this.minProd = minProd;
         this.start();
     }
 
-    public static void dormirAleatoirement() {
+    public int generateRandomNumber() {
         Random random = new Random();
-        int dureeMaxSommeil = 700; // durée maximale du sommeil en millisecondes
-        int dureeSommeil = random.nextInt(dureeMaxSommeil + 1);
+        return random.nextInt(maxProd - minProd + 1) + minProd;
+    }
+
+    public void dormir() {
         try {
             Thread.sleep(dureeSommeil);
         } catch (InterruptedException e) {
@@ -33,8 +40,9 @@ public class Producer extends Thread {
         Thread[] threads = new Thread[numberOfThreads];
         for (int i = 0; i < numberOfThreads; i++) {
             threads[i] = new Thread(() -> {
-                for (int j = 0; j < PUT_PER_THREAD; j++) {
-                    dormirAleatoirement();
+                int numberOfProd = generateRandomNumber();
+                for (int j = 0; j < numberOfProd; j++) {
+                    dormir();
                     try {
                         this.buffer.put(new Message());
                     } catch (InterruptedException e) {
