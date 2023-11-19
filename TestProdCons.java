@@ -30,7 +30,7 @@ public class TestProdCons {
         int maxProd = Integer.parseInt(properties.getProperty("maxProd"));
         
         // Create an instance of the shared buffer
-        IProdConsBuffer buffer = new ProdConsBuffer(bufSz);
+        IProdConsBuffer buffer = new ProdConsBufferSem(bufSz);
         System.out.println("Buffer size: " + bufSz);
 
 
@@ -46,7 +46,12 @@ public class TestProdCons {
         }
 
         while (buffer.nmsg()!=0) {
-            System.out.println("Il reste " + buffer.nmsg() + " messages dans le buffer");
+            //System.out.println("Il reste " + buffer.nmsg() + " messages dans le buffer");
+            try {
+                Thread.sleep(100); // on suspend le thread pour 100ms avant de reverifier
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
         System.out.println("Le test est terminé.");
