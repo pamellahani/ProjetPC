@@ -71,6 +71,7 @@ public class ProdConsBuffer implements IProdConsBuffer {
         Message m = this.msg_array[getOutIndex()];
         this.num_free++;
         this.num_stored--;
+        notifyAll();
         return m;
     }
 

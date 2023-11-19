@@ -6,6 +6,14 @@ import java.util.Properties;
 
 public class TestProdCons {
 
+    /* 
+     * Pour assuer la terminaison du program apres la consommation de 
+     * tout les Messages , on attend la terminaison to tout les threads producteur
+     * puis on verifie dans une boucle infinie que le nombre de message dans le buffer
+     * est != 0 , et comme les threads consommateurs son mit en Deamon , donc le programme
+     * ce termine est les threads du consommation seront automatiquement termine
+     */
+
     public static void main(String[] args) throws InvalidPropertiesFormatException, IOException {
         
         // Load properties from XML file
@@ -23,6 +31,7 @@ public class TestProdCons {
         
         // Create an instance of the shared buffer
         IProdConsBuffer buffer = new ProdConsBuffer(bufSz);
+        System.out.println("Buffer size: " + bufSz);
 
 
         // Create a producer and a consumer
@@ -32,9 +41,12 @@ public class TestProdCons {
         // Wait for both producer and consumer to finish
         try {
             producteur.join();
-            consommateur.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
+        }
+
+        while (buffer.nmsg()!=0) {
+            System.out.println("Il reste " + buffer.nmsg() + " messages dans le buffer");
         }
 
         System.out.println("Le test est terminé.");

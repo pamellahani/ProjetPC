@@ -44,7 +44,9 @@ public class Producers extends Thread {
                 for (int j = 0; j < numberOfProd; j++) {
                     dormir();
                     try {
-                        this.buffer.put(new Message());
+                        Message msg = new Message();
+                        this.buffer.put(msg);
+                        //System.out.println("--> Message produit num " + msg.getMessageID() + " --> " + msg.getChaineAleatoire());
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

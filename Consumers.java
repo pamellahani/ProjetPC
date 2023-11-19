@@ -11,6 +11,7 @@ public class Consumers extends Thread {
         this.buffer = buffer;
         this.nombreThreads = nombreConsumers;
         this.dureeSommeil = dureeSommeil;
+        this.setDaemon(true);
         this.start();
     }
 
@@ -27,26 +28,19 @@ public class Consumers extends Thread {
         Thread[] consumers = new Thread[nombreThreads];
         for (int i = 0; i < nombreThreads; i++) {
             consumers[i] = new Thread(() -> {
-                for (int j = 0; j < nombreThreads; j++) {
+                while (true) {
                     dormir();
                     try {
                         Message message = (Message) this.buffer.get();
-                        System.out.println("Message generer num " + message.getMessageID() + " --> " + message.getChaineAleatoire());
+                        System.out.println("Message consommer num " + message.getMessageID() + " --> " + message.getChaineAleatoire());
                         // Process the message as needed
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
             });
+            consumers[i].setDaemon(true);
             consumers[i].start();
-        }
-
-        for (int i = 0; i < nombreThreads; i++) {
-            try {
-                consumers[i].join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
         }
     }
 }
