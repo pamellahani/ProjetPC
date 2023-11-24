@@ -1,4 +1,4 @@
-package projetpc;
+package projetpc.objectif2;
 
 import java.io.IOException;
 import java.util.InvalidPropertiesFormatException;
@@ -30,7 +30,7 @@ public class TestProdCons {
         int maxProd = Integer.parseInt(properties.getProperty("maxProd"));
         
         // Create an instance of the shared buffer
-        IProdConsBuffer buffer = new ProdConsBufferSem(bufSz);
+        IProdConsBuffer buffer = new ProdConsBuffer(bufSz);
         System.out.println("Buffer size: " + bufSz);
 
 

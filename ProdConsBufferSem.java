@@ -1,4 +1,4 @@
-package ProjetPC;
+package projetpc;
 
 import java.util.concurrent.Semaphore;
 

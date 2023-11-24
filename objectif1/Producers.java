@@ -1,4 +1,4 @@
-package projetpc;
+package projetpc.objectif1;
 
 import java.util.Random;
 
