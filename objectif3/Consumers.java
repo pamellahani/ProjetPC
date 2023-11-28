@@ -1,4 +1,4 @@
-package projetpc.objectif2;
+package projetpc.objectif3;
 
 
 public class Consumers extends Thread {

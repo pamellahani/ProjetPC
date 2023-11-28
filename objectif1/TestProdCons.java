@@ -38,22 +38,7 @@ public class TestProdCons {
         Producers producteur = new Producers(buffer, nProd, minProd, maxProd, prodTime);
         Consumers consommateur = new Consumers(buffer, nCons, consTime);
 
-        // Wait for both producer and consumer to finish
-        try {
-            producteur.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
-        while (buffer.nmsg()!=0) {
-            //System.out.println("Il reste " + buffer.nmsg() + " messages dans le buffer");
-            try {
-                Thread.sleep(100); // on suspend le thread pour 100ms avant de reverifier
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-        System.out.println("Le test est terminé.");
+        System.out.println("--> Thread Initial est terminee");
     }
 }

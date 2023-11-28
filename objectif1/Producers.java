@@ -55,12 +55,5 @@ public class Producers extends Thread {
             threads[i].start();
         }
 
-        for (int i = 0; i < numberOfThreads; i++) {
-            try {
-                threads[i].join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
     }
 }

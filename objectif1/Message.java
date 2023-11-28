@@ -1,4 +1,5 @@
 package projetpc.objectif1;
+
 import java.util.Random;
 
 public class Message {
@@ -6,10 +7,11 @@ public class Message {
 
     private String chaineAleatoire;
     private int longueur = 10;
-    private int id = messageCount++;
+    private int id;
 
     public Message() {
         this.chaineAleatoire = genererChaineAleatoire();
+        setId();
     }
 
     public String getChaineAleatoire() {
@@ -29,7 +31,12 @@ public class Message {
         return chaineAleatoireBuilder.toString();
     }
 
-    int getMessageID() {
+    private synchronized void setId() {
+        this.id = messageCount;
+        messageCount += 1;
+    }
+
+    public int getMessageID() {
         return id;
     }
 }

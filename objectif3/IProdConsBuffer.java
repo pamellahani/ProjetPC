@@ -1,4 +1,4 @@
-package projetpc;
+package projetpc.objectif3;
 
 public interface IProdConsBuffer {
     /**

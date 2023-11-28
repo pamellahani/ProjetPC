@@ -39,7 +39,7 @@ public class Consumers extends Thread {
                     }
                 }
             });
-            consumers[i].setDaemon(true);
+            consumers[i].setDaemon(false);
             consumers[i].start();
         }
     }
