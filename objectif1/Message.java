@@ -1,17 +1,17 @@
 package projetpc.objectif1;
-
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Message {
-    static int messageCount = 1;
-
     private String chaineAleatoire;
     private int longueur = 10;
     private int id;
 
+    private static final AtomicInteger messageCount = new AtomicInteger(1);
+
     public Message() {
         this.chaineAleatoire = genererChaineAleatoire();
-        setId();
+        this.id = messageCount.getAndIncrement();
     }
 
     public String getChaineAleatoire() {
@@ -29,11 +29,6 @@ public class Message {
         }
 
         return chaineAleatoireBuilder.toString();
-    }
-
-    private synchronized void setId() {
-        this.id = messageCount;
-        messageCount += 1;
     }
 
     public int getMessageID() {

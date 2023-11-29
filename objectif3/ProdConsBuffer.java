@@ -1,114 +1,82 @@
 package projetpc.objectif3;
 
+import java.util.concurrent.Semaphore;
+
 /* 
- * Solution Directe : Objectif 1
- * Cette solution est implementer en utilisant 
- * que les Moniteurs
- * 
+ * Objectif 3 :
+ * Solution avec des semaphores
  */
 
 public class ProdConsBuffer implements IProdConsBuffer {
-    Message msg_array[];
+    private Message[] msgArray;
 
-    // array size
-    int size = 0;
+    // taille du buffer
+    private int size;
 
-    // number of putted messages
-    int total_putted = 0;
+    // le nombre total des messages mit dedans
+    private int totalPutted = 0;
 
-
-    // tracking variables for put and get
-    int num_free = 0;
-    int num_stored = 0; // same as currently stored messages
+    // les semaphores
+    private Semaphore notFull;
+    private Semaphore notEmpty;
+    private Semaphore mutex;
 
     // les indexes in et out
     int index_in = 0;
     int index_out = 0;
 
-    private int getInIndex(){
+    public ProdConsBuffer(int size) {
+        this.size = size;
+        msgArray = new Message[size];
+        notFull = new Semaphore(size);
+        notEmpty = new Semaphore(0);
+        mutex = new Semaphore(1);
+    }
+
+    private int getInIndex() {
         int i = index_in;
-        this.index_in = (index_in + 1 ) % this.size;
+        this.index_in = (index_in + 1) % this.size;
         return i;
     }
 
-    private int getOutIndex(){
+    private int getOutIndex() {
         int i = index_out;
         this.index_out = (index_out + 1) % this.size;
         return i;
     }
 
-    public ProdConsBuffer(int size) {
-        this.size = size;
-        msg_array = new Message[size];
-        this.num_free = size;
+    @Override
+    public void put(Message m) throws InterruptedException {
+        notFull.acquire(); // On attend qu'un place soit disponible pour put
+        mutex.acquire(); // entrer dans la section critique
+
+        msgArray[getInIndex()] = m;
+        totalPutted++;
+
+        mutex.release(); // sortie de la section critique
+        notEmpty.release(); // on indique qu'un message est disponible
     }
 
-    /**
-     * Put the message m in the buffer
-     **/
     @Override
-    public synchronized void put(Message m) throws InterruptedException {
-        while(num_free==0){
-            wait();
-        }
-        this.msg_array[getInIndex()] = m;
-        this.num_free--;
-        this.num_stored++;
-        this.total_putted++;
-        notifyAll();
-    }
+    public Message get() throws InterruptedException {
+        notEmpty.acquire(); // on attend qu'un message soit disponible pour retirer
+        mutex.acquire(); // entrer dans la section critique
 
-    /**
-     * Retrieve a message from the buffer,
-     * following a FIFO order (if M1 was put before M2, M1
-     * is retrieved before M2)
-     **/
-    @Override
-    public synchronized Message get() throws InterruptedException {
-        while (num_stored==0) {
-            wait();
-        }
-        Message m = this.msg_array[getOutIndex()];
-        this.num_free++;
-        this.num_stored--;
-        notifyAll();
+        Message m = msgArray[getOutIndex()];
+
+        mutex.release(); // sortie de la section critique
+        notFull.release(); // on indique qu'une place est disponible
+
         return m;
     }
 
-    /**
-     * Returns the number of messages currently available in
-     * the buffer
-     **/
     @Override
     public int nmsg() {
-        return num_stored;
+        return notEmpty.availablePermits();
     }
 
-    /**
-     * Returns the total number of messages that have
-     * been put in the buffer since its creation
-     **/
     @Override
     public int totmsg() {
-        return total_putted;
+        return totalPutted;
     }
-
-    /*
-    Objectif 1 :
-    
-    Tableau du gardes_actions :
-
-    +----------------------+------------+---------------+---------------------------+
-    | Methode              | Pre-Action | Garde         | Post-Action               |
-    +----------------------+------------+---------------+---------------------------+
-    | Produce(Message msg) | ---------  | num_free==0   | num_free-- ; num_stored++ |
-    +----------------------+------------+---------------+---------------------------+
-    | Message Consume()    | ---------  | num_stored==0 | num_free++ ; num_stored-- |
-    +----------------------+------------+---------------+---------------------------+
-
-
-    */
-
-
-
 }

@@ -1,4 +1,4 @@
-package projetpc.objectif3;
+package projetpc.objectif5;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
