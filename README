@@ -1,0 +1,13 @@
+Projet JAVA Prod/Consommateurs - 2023/2024
+Fait par :
+Ali FAWAZ
+Pamella HANI
+
+## Comment lancer le projet ? 
+
+## Description du projet
+Ce projet est une implémentation du problème des producteurs et des consommateurs en
+utilisant les threads et les moniteurs en JAVA.
+
+## Description de l'implémentation
+Nous avons creer un repertoire pour chaque objectif du projet. 

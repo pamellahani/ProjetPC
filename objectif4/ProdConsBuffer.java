@@ -105,7 +105,6 @@ public class ProdConsBuffer implements IProdConsBuffer {
     public int totmsg() {
         return total_putted;
     }
-
     
 }
 

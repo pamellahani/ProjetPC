@@ -93,18 +93,35 @@ public class ProdConsBuffer implements IProdConsBuffer {
         return total_putted;
     }
 
+    @Override
+    public synchronized Message[] get(int k) throws InterruptedException {
+        while (num_stored<k) {
+            wait();
+        }
+        Message[] messages = new Message[k];
+        for (int i = 0; i < k; i++) {
+            messages[i] = this.msg_array[getOutIndex()];
+            num_free++;
+            num_stored--;
+        }
+        notifyAll();
+        return messages;
+    }
+
     /*
     Objectif 1 :
     
-    Tableau du gardes_actions :
+    Tableau gardes-actions :
 
-    +----------------------+------------+---------------+---------------------------+
-    | Methode              | Pre-Action | Garde         | Post-Action               |
-    +----------------------+------------+---------------+---------------------------+
-    | Produce(Message msg) | ---------  | num_free==0   | num_free-- ; num_stored++ |
-    +----------------------+------------+---------------+---------------------------+
-    | Message Consume()    | ---------  | num_stored==0 | num_free++ ; num_stored-- |
-    +----------------------+------------+---------------+---------------------------+
+    +----------------------+------------+---------------+-------------------------------+
+    | Methode              | Pre-Action | Garde         | Post-Action                   |
+    +----------------------+------------+---------------+-------------------------------+
+    | Produce(Message msg) | ---------  | num_free==0   | num_free-- ; num_stored++     |
+    +----------------------+------------+---------------+-------------------------------+
+    | Message Consume()    | ---------  | num_stored==0 | num_free++ ; num_stored--     |
+    +----------------------+------------+---------------+-------------------------------+
+    | Meesage[] Consume(k) | ---------  | num_stored<k  | num_free+=k ; num_stored-=k   |
+    +----------------------+------------+---------------+-------------------------------+
 
 
     */
