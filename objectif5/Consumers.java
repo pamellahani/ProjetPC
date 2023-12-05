@@ -34,7 +34,7 @@ public class Consumers extends Thread {
         Thread[] consumers = new Thread[nombreThreads];
         for (int i = 0; i < nombreThreads; i++) {
             consumers[i] = new Thread(() -> {
-                while (running) {
+                while (true) {
                     dormir();
                     try {
                         Message[] message = (Message[]) this.buffer.get(4);

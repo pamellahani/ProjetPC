@@ -42,7 +42,7 @@ public class TestProdCons {
         try {
             producteur.join();
             consommateur.stopConsumers();   
-            consommateur.join();
+            //consommateur.join();
             //no need to consommateur.join() because the thread is a daemon
         } catch (InterruptedException e) {
             e.printStackTrace();
