@@ -1,6 +1,7 @@
 package projetpc.objectif6;
 
 import java.util.HashMap;
+import java.util.concurrent.Semaphore;
 
 /* 
  * Solution Directe : Objectif 1
@@ -51,19 +52,20 @@ public class ProdConsBuffer implements IProdConsBuffer {
      * Put the message m in the buffer
      **/
     @Override
-    public synchronized void put(Message m, int n) throws InterruptedException {
-        while (num_free < n) {
-            wait();
+    public void put(Message m, int n) throws InterruptedException {
+        Pair mypair;
+        synchronized (this) {
+            while (num_free < n) {
+                wait();
+            }
+            mypair = new Pair(m, n);
+            this.msg_array[getInIndex()] = mypair;
+            this.num_free--; // free space in array
+            this.num_stored += n;
+            this.total_putted += n;
+            notifyAll();
         }
-        Pair mypair = new Pair(m, n);
-        this.msg_array[getInIndex()] = mypair;
-        this.num_free--; // free space in array
-        this.num_stored += n;
-        this.total_putted += n;
-        notifyAll();
-        while (!mypair.isEmpty()) {
-            wait();
-        }
+        mypair.attenteConsommation(n);
     }
 
     /**
@@ -72,24 +74,26 @@ public class ProdConsBuffer implements IProdConsBuffer {
      * is retrieved before M2)
      **/
     @Override
-    public synchronized Message get() throws InterruptedException {
-        while (num_stored == 0) {
-            wait();
-        }
-        Pair mypair = this.msg_array[getOutIndex()];
-        Message m = mypair.getMessage();
-        mypair.removeExemplaire();
-        this.num_stored--;
+    public Message get() throws InterruptedException {
+        Pair mypair;
+        Message m;
+        synchronized (this) {
+            while (num_stored == 0) {
+                wait();
+            }
+            mypair = this.msg_array[getOutIndex()];
+            m = mypair.getMessage();
+            mypair.removeExemplaire();
+            this.num_stored--;
 
-        if (mypair.isEmpty()) {
-            this.msg_array[index_out] = null;
-            this.num_free++;
-            updateOutIndex();
+            if (mypair.isEmpty()) {
+                this.msg_array[index_out] = null;
+                this.num_free++;
+                updateOutIndex();
+            }
+            notifyAll();
         }
-        notifyAll();
-        while (!mypair.isEmpty()) {
-            wait();
-        }
+        mypair.attenteGet();
         return m;
     }
 
@@ -137,6 +141,8 @@ public class ProdConsBuffer implements IProdConsBuffer {
 class Pair {
     Message msg;
     int exemplaires;
+    Semaphore onPut = new Semaphore(0);
+    Semaphore onGet = new Semaphore(0);
 
     public Pair(Message msg, int exemplaires) {
         this.msg = msg;
@@ -153,6 +159,24 @@ class Pair {
 
     public void removeExemplaire() {
         this.exemplaires--;
+        this.onPut.release();
+    }
+
+    public void attenteConsommation(int num_messages) {
+        try {
+            this.onPut.acquire(num_messages);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        this.onGet.release(num_messages);
+    }
+
+    public void attenteGet() {
+        try {
+            this.onGet.acquire();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 }
