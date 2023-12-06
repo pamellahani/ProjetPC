@@ -9,6 +9,8 @@ public interface IProdConsBuffer {
      * Retrieve k consecutive messages from the prodcons buffer,
      */
     public Message[] get(int k) throws InterruptedException;
+
+    
     /**
      * Retrieve a message from the buffer,
      * following a FIFO order (if M1 was put before M2, M1

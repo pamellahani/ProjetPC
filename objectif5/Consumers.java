@@ -7,8 +7,6 @@ public class Consumers extends Thread {
     int nombreThreads = 5;
     int dureeSommeil = 10;
 
-    private volatile boolean running = true;
-
     public Consumers(IProdConsBuffer buffer, int nombreConsumers, int dureeSommeil) {
         this.buffer = buffer;
         this.nombreThreads = nombreConsumers;
@@ -25,10 +23,6 @@ public class Consumers extends Thread {
         }
     }
 
-    public void stopConsumers() {
-        running = false;
-    }
-
     @Override
     public void run() {
         Thread[] consumers = new Thread[nombreThreads];
@@ -37,12 +31,10 @@ public class Consumers extends Thread {
                 while (true) {
                     dormir();
                     try {
-                        Message[] message = (Message[]) this.buffer.get(4);
+                        Message[] message = this.buffer.get(4);
                         for (int j = 0; j < message.length; j++) {
                             System.out.println("Message consommer num " + message[j].getMessageID() + " --> " + message[j].getChaineAleatoire());
                         }
-                       // System.out.println("Message consommer num " + message.getMessageID() + " --> " + message.getChaineAleatoire()); objectif1
-                        // Process the message as needed
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
