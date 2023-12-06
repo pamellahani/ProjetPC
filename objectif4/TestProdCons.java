@@ -46,7 +46,6 @@ public class TestProdCons {
         }
 
         while (buffer.nmsg()!=0) {
-            //System.out.println("Il reste " + buffer.nmsg() + " messages dans le buffer");
             try {
                 Thread.sleep(100); // on suspend le thread pour 100ms avant de reverifier
             } catch (InterruptedException e) {
