@@ -41,6 +41,9 @@ public class TestProdCons {
         // Wait for both producer and consumer to finish
         try {
             producteur.join();
+            consommateur.stopConsumers();   
+            //consommateur.join();
+            //no need to consommateur.join() because the thread is a daemon
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
