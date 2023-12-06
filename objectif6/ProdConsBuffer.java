@@ -1,6 +1,5 @@
 package projetpc.objectif6;
 
-import java.util.HashMap;
 import java.util.concurrent.Semaphore;
 
 /* 
@@ -11,7 +10,7 @@ import java.util.concurrent.Semaphore;
  */
 
 public class ProdConsBuffer implements IProdConsBuffer {
-    Pair[] msg_array;
+    MessageData[] msg_array;
 
     // array size
     int size = 0;
@@ -35,16 +34,13 @@ public class ProdConsBuffer implements IProdConsBuffer {
 
     private int getOutIndex() {
         int i = index_out;
-        return i;
-    }
-
-    private void updateOutIndex() {
         this.index_out = (index_out + 1) % this.size;
+        return i;
     }
 
     public ProdConsBuffer(int size) {
         this.size = size;
-        msg_array = new Pair[size];
+        msg_array = new MessageData[size];
         this.num_free = size;
     }
 
@@ -53,19 +49,21 @@ public class ProdConsBuffer implements IProdConsBuffer {
      **/
     @Override
     public void put(Message m, int n) throws InterruptedException {
-        Pair mypair;
+        MessageData mydata;
         synchronized (this) {
             while (num_free < n) {
                 wait();
             }
-            mypair = new Pair(m, n);
-            this.msg_array[getInIndex()] = mypair;
-            this.num_free--; // free space in array
-            this.num_stored += n;
-            this.total_putted += n;
+            mydata = new MessageData(m);
+            for (int i = 0; i < n; i++) {
+                this.msg_array[getInIndex()] = mydata;
+                this.num_free--; // free space in array
+                this.num_stored++;
+                this.total_putted++;
+            }
             notifyAll();
         }
-        mypair.attenteConsommation(n);
+        mydata.attenteDansPut(n);
     }
 
     /**
@@ -75,25 +73,20 @@ public class ProdConsBuffer implements IProdConsBuffer {
      **/
     @Override
     public Message get() throws InterruptedException {
-        Pair mypair;
+        MessageData mydata;
         Message m;
         synchronized (this) {
             while (num_stored == 0) {
                 wait();
             }
-            mypair = this.msg_array[getOutIndex()];
-            m = mypair.getMessage();
-            mypair.removeExemplaire();
+            mydata = this.msg_array[getOutIndex()];
+            m = mydata.getMessage();
+            mydata.removeExemplaire();
             this.num_stored--;
-
-            if (mypair.isEmpty()) {
-                this.msg_array[index_out] = null;
-                this.num_free++;
-                updateOutIndex();
-            }
+            this.num_free++;
             notifyAll();
         }
-        mypair.attenteGet();
+        mydata.attenteDansGet();
         return m;
     }
 
@@ -138,31 +131,24 @@ public class ProdConsBuffer implements IProdConsBuffer {
 
 }
 
-class Pair {
+class MessageData {
     Message msg;
-    int exemplaires;
     Semaphore onPut = new Semaphore(0);
     Semaphore onGet = new Semaphore(0);
 
-    public Pair(Message msg, int exemplaires) {
+    public MessageData(Message msg) {
         this.msg = msg;
-        this.exemplaires = exemplaires;
     }
 
     public Message getMessage() {
         return this.msg;
     }
 
-    public boolean isEmpty() {
-        return this.exemplaires <= 0;
-    }
-
     public void removeExemplaire() {
-        this.exemplaires--;
         this.onPut.release();
     }
 
-    public void attenteConsommation(int num_messages) {
+    public void attenteDansPut(int num_messages) {
         try {
             this.onPut.acquire(num_messages);
         } catch (InterruptedException e) {
@@ -171,7 +157,7 @@ class Pair {
         this.onGet.release(num_messages);
     }
 
-    public void attenteGet() {
+    public void attenteDansGet() {
         try {
             this.onGet.acquire();
         } catch (InterruptedException e) {
