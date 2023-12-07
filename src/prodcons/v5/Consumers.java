@@ -11,7 +11,6 @@ public class Consumers extends Thread {
         this.buffer = buffer;
         this.nombreThreads = nombreConsumers;
         this.dureeSommeil = dureeSommeil;
-        this.setDaemon(true);
         this.start();
     }
 
@@ -40,7 +39,6 @@ public class Consumers extends Thread {
                     }
                 }
             });
-            consumers[i].setDaemon(true);
             consumers[i].start();
         }
     }

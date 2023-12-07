@@ -11,7 +11,6 @@ public class Consumers extends Thread {
         this.buffer = buffer;
         this.nombreThreads = nombreConsumers;
         this.dureeSommeil = dureeSommeil;
-        this.setDaemon(true);
         this.start();
     }
 
